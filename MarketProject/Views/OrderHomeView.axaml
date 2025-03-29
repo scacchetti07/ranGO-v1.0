@@ -6,6 +6,7 @@
              x:Class="MarketProject.Views.OrderHomeView"
              xmlns:vm="clr-namespace:MarketProject.ViewModels"
              xmlns:controls="clr-namespace:MarketProject.Controls"
+             xmlns:view="clr-namespace:MarketProject.Views"
              x:DataType="vm:OrderHomeViewModel"
              FontFamily="{StaticResource FilsonPro}"
              Width="1581"
@@ -47,7 +48,9 @@
                 <WrapPanel Classes="OrderCardsDisplay" Name="OrderCardsPanel"/>
             </ScrollViewer>
         </Grid>
-        <Panel HorizontalAlignment="Right" x:Name="FoodMenuViewPanel"/>
+        <Panel HorizontalAlignment="Right" x:Name="FoodMenuViewPanel" Classes="FoodMenuViewDefault">
+            <view:FoodMenuView HorizontalAlignment="Right" x:Name="FoodMenuView"/>
+        </Panel>
         
         <controls:AnimatedPopup x:Name="AddPopup"
                                  PlacementMode="Absolute"

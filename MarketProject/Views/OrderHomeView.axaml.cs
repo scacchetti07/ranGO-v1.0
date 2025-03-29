@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using System.Timers;
 using System.Windows.Input;
 using Avalonia;
@@ -164,7 +165,8 @@ public partial class OrderHomeView : UserControl
 
             Dispatcher.UIThread.Post(() =>
             {
-                var lastId = new string(newOrder.Id.TakeLast(4).ToArray());
+                StringBuilder sb = new StringBuilder();
+                var lastId = sb.Append(newOrder.Id.TakeLast(4));
                 AddPopup.IsOpen = true;
                 AddProdLabel.Content = "Novo Pedido Adicionado!";
                 ContentAddTextBlock.Text = $"Pedido de Id '#{lastId}' foi adicionado!";
@@ -214,15 +216,11 @@ public partial class OrderHomeView : UserControl
 
     private void FoodMenuButton_OnClick(object sender, RoutedEventArgs e)
     {
-        FoodMenuView foodMenuView = new() { HorizontalAlignment = HorizontalAlignment.Right };
-
-        FoodMenuViewPanel.Children.Add(foodMenuView);
-        FoodMenuViewPanel.Classes.Add("FoodMenuAnimation");
-
-        foodMenuView.ExitButton.Command = ReactiveCommand.Create(() =>
+        FoodMenuViewPanel.Classes.Add("OpenFoodMenuView");
+        
+        FoodMenuView.ExitButton.Command = ReactiveCommand.Create(() =>
         {
-            FoodMenuViewPanel.Classes.Clear();
-            FoodMenuViewPanel.Children.Clear();
+            FoodMenuViewPanel.Classes.Remove("OpenFoodMenuView");
         });
     }
 

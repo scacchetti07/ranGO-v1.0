@@ -17,12 +17,13 @@ public partial class App : Application
     {
         AvaloniaXamlLoader.Load(this);
         var collection = new ServiceCollection();
-        collection.AddSingleton<Database>(); // Declarado o serviço "DataBase" no provider
-        collection.AddSingleton<HomeViewModel>(); // Declardo o serviço "HomeViewModel" no provider
+        collection.AddSingleton<Database>(); // Declarado o serviço "Database"
+        collection.AddSingleton<HomeViewModel>(); // Declardo o serviço "HomeViewModel"
       
-        var services = collection.BuildServiceProvider(); // Implementando os serviços por meio do provider
+        var services = collection.BuildServiceProvider(); // Implementando os serviços
+
         _provider = services;
-        this.Resources[typeof(ServiceProvider)] = services; // Recebe os serviõs estabelecidos pelo provider na aplicação 
+        this.Resources[typeof(ServiceProvider)] = services; // Recebe os serviços estabelecidos na aplicação 
     }
 
     public override void OnFrameworkInitializationCompleted()

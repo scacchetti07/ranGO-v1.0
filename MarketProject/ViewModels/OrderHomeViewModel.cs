@@ -14,13 +14,15 @@ public class OrderHomeViewModel : ViewModelBase
     public OrderCards OrderToCard(Orders order)
     {
         List<string> FoodOrderNames = new();
-        FoodOrderNames.AddRange(order.FoodsOrder.Select(foodId =>
-            FoodMenuController.FindFoodMenu(foodId).Result.FoodName));
+        var foods = order.FoodsOrder.Select(foodId =>
+            FoodMenuController.FindFoodMenu(foodId).Result.FoodName).ToList();
+        if (foods.Count != 0)
+            FoodOrderNames.AddRange(foods);
 
         OrderCards orderCards = new()
         {
             WaiterName = order.WaiterName,
-            FoodOrderNames = String.Join(", ", FoodOrderNames.TakeLast(2)) + $" + {FoodOrderNames.Count-1}",
+            FoodOrderNames = FoodOrderNames.Count != 0 ? String.Join(", ", FoodOrderNames.TakeLast(2)) + $" + {FoodOrderNames.Count-1}" : "",
             TableNumber = order.TableNumber,
             Id = order.Id,
             OrderStatus = order.OrderStatus

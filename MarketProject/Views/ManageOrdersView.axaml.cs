@@ -180,7 +180,7 @@ public partial class ManageOrdersView : Window
 
     private async void FoodsAutoCompleteBox_OnKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key != Key.Enter) return;
+        if (e.Key != Key.Enter) return; 
 
         Foods food = await FoodMenuController.FindFoodMenuByNameAsync(FoodsAutoCompleteBox.Text);
         if (food is null || AutoCompleteSelectedFoodsList.Any(p => p.Id == food.Id)) return;
