@@ -9,15 +9,17 @@ using MarketProject.Views;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace MarketProject.Models;
 
 public class Database
 {
-    public static ObservableCollection<Product> ProductsList { get; private set; } = new();
-    public static ObservableCollection<Supply> SupplyList { get; private set; } = new();
-    public static ObservableCollection<Orders> OrdersList { get; private set; } = new();
-    public static ObservableCollection<Foods> FoodsMenuList { get; private set; } = new();
+    public static event Action DatabaseRestored;
+    public static ObservableCollection<Product> ProductsList { get; set; } = new();
+    public static ObservableCollection<Supply> SupplyList { get; set; } = new();
+    public static ObservableCollection<Orders> OrdersList { get; set; } = new();
+    public static ObservableCollection<Foods> FoodsMenuList { get; set; } = new();
 
     private static MongoClient _client =
         new("mongodb+srv://luiscacchetti07:c2qb5VFjcVBA18PH@rango.3fwol.mongodb.net/");
@@ -32,6 +34,11 @@ public class Database
     {
         _client.StartSession();
         Console.WriteLine("Conexão Estabelecida!");
+    }
+
+    public static void DatabaseRestoredNotify()
+    {
+        DatabaseRestored?.Invoke();
     }
 
     public async void StartStorage()
@@ -59,7 +66,7 @@ public class Database
         Console.WriteLine("Listas de Pedidos e Cardápio iniciadas!");
     }
 
-    public static async void DropDatabase(DbType collection)
+    public static async Task DropDatabase(DbType collection)
     {
         switch (collection)
         {
@@ -81,7 +88,7 @@ public class Database
                 break;
         }
     }
-    public static async void CreateNewCollectionIntoDatabase(DbType collection)
+    public static async Task CreateNewCollectionIntoDatabase(DbType collection)
     {
         switch (collection)
         {
@@ -100,25 +107,25 @@ public class Database
         }
     }
 
-    public static async void AddDataIntoDatabase(IEnumerable<Product> prods)
+    public static async Task AddDataIntoDatabase(IEnumerable<Product> prods)
     {
         var prodCollection = GetDatabase("storage").GetCollection<Product>("products");
         if (!prods.Any()) return;
         await prodCollection.InsertManyAsync(prods);
     }
-    public static async void AddDataIntoDatabase(IEnumerable<Supply> supplies)
+    public static async Task AddDataIntoDatabase(IEnumerable<Supply> supplies)
     {
         var prodCollection = GetDatabase("storage").GetCollection<Supply>("supplys");
         if (!supplies.Any()) return;
         await prodCollection.InsertManyAsync(supplies);
     }
-    public static async void AddDataIntoDatabase(IEnumerable<Orders> orders)    
+    public static async Task AddDataIntoDatabase(IEnumerable<Orders> orders)    
     {
         var prodCollection = GetDatabase("storage").GetCollection<Orders>("orders");
         if (!orders.Any()) return;
         await prodCollection.InsertManyAsync(orders);
     }
-    public static async void AddDataIntoDatabase(IEnumerable<Foods> foods)
+    public static async Task AddDataIntoDatabase(IEnumerable<Foods> foods)
     {
         var prodCollection = GetDatabase("storage").GetCollection<Foods>("foodMenu");
         if (!foods.Any()) return;

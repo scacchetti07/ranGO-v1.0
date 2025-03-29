@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Avalonia;
@@ -28,31 +29,34 @@ public partial class SupplyView : UserControl
         InitializeComponent();
         SupplyDataGrid.ItemsSource = Database.SupplyList.Select(SupplyViewModel.SuppliesToDataGrid);
 
-        // Resolução do Erro: Call Invalid Thread
-        Database.SupplyList.CollectionChanged += (sender, _) =>
+        InitMethods();
+        Database.DatabaseRestored += () =>
         {
-            // Faz com que o código que atualiza o datagrid seja atualizado na UIThread.
-            Dispatcher.UIThread.Post(() =>
-            {
-                SupplyDataGrid.ItemsSource = new List<SupplyDataGrid>();
-                SupplyDataGrid.ItemsSource = (sender as ObservableCollection<Supply>)!
-                    .Select(SupplyViewModel.SuppliesToDataGrid);
-            }, DispatcherPriority.Background);
+            Dispatcher.UIThread.Post(InitMethods);
+            UpdateSupplyDatagrid(null,null);
         };
-
-        Database.ProductsList.CollectionChanged += (_, _) =>
-        {
-            Dispatcher.UIThread.Post(() =>
-            {
-                SupplyDataGrid.ItemsSource = new List<SupplyDataGrid>();
-                SupplyDataGrid.ItemsSource = Database.SupplyList.Select(SupplyViewModel.SuppliesToDataGrid);
-            }, DispatcherPriority.Background);
-        };
-
+        
         if (Database.SupplyList.Select(s => s.InDeliver).FirstOrDefault())
             SendSupplyDeliverButton.Classes.Add("DefineSupplyDeliverButtonToolTip");
         else
             SendSupplyDeliverButton.Classes.Remove("DefineSupplyDeliverButtonToolTip");
+    }
+
+    private void InitMethods()
+    {
+        // Resolução do Erro: Call Invalid Thread
+        Database.SupplyList.CollectionChanged += UpdateSupplyDatagrid;
+        Database.ProductsList.CollectionChanged += UpdateSupplyDatagrid;
+    }
+
+    private void UpdateSupplyDatagrid(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            SupplyDataGrid.ItemsSource = new List<SupplyDataGrid>();
+            IEnumerable<Supply> list = (sender as ObservableCollection<Supply>) ?? (IEnumerable<Supply>)Database.SupplyList.ToList();
+            SupplyDataGrid.ItemsSource = list.Select(SupplyViewModel.SuppliesToDataGrid);
+        }, DispatcherPriority.Background);
     }
 
     private async void AddSupply_OnClick(object sender, RoutedEventArgs e)

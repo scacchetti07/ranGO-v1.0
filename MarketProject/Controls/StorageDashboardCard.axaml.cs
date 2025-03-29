@@ -13,7 +13,18 @@ public partial class StorageDashboardCard : UserControl
     {
         InitializeComponent();
         UpdateDashboardCard();
+        InitMethods();
+        Database.DatabaseRestored += () =>
+        {
+            InitMethods();
+            UpdateDashboardCard();
+        };
+    }
+
+    private void InitMethods()
+    {
         Database.ProductsList.CollectionChanged += (_, _) => { UpdateDashboardCard(); };
+
     }
 
     private void UpdateDashboardCard()

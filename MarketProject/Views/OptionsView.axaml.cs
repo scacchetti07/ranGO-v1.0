@@ -74,18 +74,20 @@ public partial class OptionsView : UserControl
                     case "supplys.json":
                         var supplies = JsonConvert.DeserializeObject<List<Supply>>(contentJson);
                         db.SupplyList.Clear();
-                        db.DropDatabase(DbType.Supply);
-                        db.CreateNewCollectionIntoDatabase(DbType.Supply);
-                        db.SupplyList.AddRange(supplies);
-                        db.AddDataIntoDatabase(supplies);
+                        await db.DropDatabase(DbType.Supply);
+                        await db.CreateNewCollectionIntoDatabase(DbType.Supply);
+                        // db.SupplyList.AddRange(supplies);
+                        db.SupplyList = new ObservableCollection<Supply>(supplies);
+                        await db.AddDataIntoDatabase(supplies);
                         break;
                     case "products.json":
                         var products = JsonConvert.DeserializeObject<List<Product>>(contentJson);
                         db.ProductsList.Clear();
-                        db.DropDatabase(DbType.Products);
-                        db.CreateNewCollectionIntoDatabase(DbType.Products);
-                        db.ProductsList.AddRange(products);
-                        db.AddDataIntoDatabase(products);
+                        await db.DropDatabase(DbType.Products);
+                        await db.CreateNewCollectionIntoDatabase(DbType.Products);
+                        // db.ProductsList.AddRange(products);
+                        db.ProductsList = new ObservableCollection<Product>(products);
+                        await db.AddDataIntoDatabase(products);
                         // foreach (var product in products)
                         // {
                         //     string supplyName = SupplyController.GetSupplyNameByProduct(product);
@@ -95,26 +97,31 @@ public partial class OptionsView : UserControl
                     case "orders.json":
                         var ordersList = JsonConvert.DeserializeObject<List<Orders>>(contentJson);
                         db.OrdersList.Clear();
-                        db.DropDatabase(DbType.Orders);
-                        db.CreateNewCollectionIntoDatabase(DbType.Orders);
-                        db.OrdersList.AddRange(ordersList);
-                        db.AddDataIntoDatabase(ordersList);
+                        await db.DropDatabase(DbType.Orders);
+                        await db.CreateNewCollectionIntoDatabase(DbType.Orders);
+                        // db.OrdersList.AddRange(ordersList);
+                        db.OrdersList = new ObservableCollection<Orders>(ordersList);
+                        await db.AddDataIntoDatabase(ordersList);
                         break;
                     case "foodMenu.json":
                         var foodsList = JsonConvert.DeserializeObject<List<Foods>>(contentJson);
                         db.FoodsMenuList.Clear();
-                        db.DropDatabase(DbType.FoodMenu);
-                        db.CreateNewCollectionIntoDatabase(DbType.Orders);
-                        db.FoodsMenuList.AddRange(foodsList);
-                        db.AddDataIntoDatabase(foodsList);
+                        await db.DropDatabase(DbType.FoodMenu);
+                        await db.CreateNewCollectionIntoDatabase(DbType.FoodMenu);
+                        // db.FoodsMenuList.AddRange(foodsList);
+                        db.FoodsMenuList = new ObservableCollection<Foods>(foodsList);
+                        await db.AddDataIntoDatabase(foodsList);
                         break;
                 }
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message+"\n");
+                Console.WriteLine(ex.StackTrace);
                 isRestored = false;
             }
         }
+        db.DatabaseRestoredNotify();
         if (isRestored is false) return;
         
         // Dispatcher.UIThread.Post(() =>

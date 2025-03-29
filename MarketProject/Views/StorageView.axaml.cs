@@ -4,6 +4,7 @@ using Avalonia;
 using MarketProject.Models;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,27 +33,30 @@ public partial class StorageView : UserControl
     {
         InitializeComponent();
         ProductsDataGrid.ItemsSource = Database.ProductsList.Select(p => StorageViewModel.ProductToDataGrid(p, (MinMaxOptions)SchedComboBox.SelectedIndex));
-        
+        InitMethods();
+        Database.DatabaseRestored += () =>
+        {
+            Dispatcher.UIThread.Post(InitMethods);
+            UpdateProductsDatagrid(null,null);
+        };
+    }
+
+    private void InitMethods()
+    {
         // Resolução do Erro: Call Invalid Thread
-        Database.ProductsList.CollectionChanged += (sender, _) =>
+        Database.ProductsList.CollectionChanged += UpdateProductsDatagrid;
+        Database.SupplyList.CollectionChanged += UpdateProductsDatagrid;
+    }
+
+    private void UpdateProductsDatagrid(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        Dispatcher.UIThread.Post(() =>
         {
-            // Faz com que o código que atualiza o datagrid seja atualizado na UIThread.
-            Dispatcher.UIThread.Post(() =>
-            {
-                ProductsDataGrid.ClearValue(DataGrid.ItemsSourceProperty);
-                ProductsDataGrid.ItemsSource = (sender as ObservableCollection<Product>)!
-                    .Select(p => StorageViewModel.ProductToDataGrid(p, (MinMaxOptions)SchedComboBox.SelectedIndex));
-            }, DispatcherPriority.Background);
-        };
-        Database.SupplyList.CollectionChanged += (_, _) =>
-        {
-            Dispatcher.UIThread.Post(() =>
-            {
-                ProductsDataGrid.ClearValue(DataGrid.ItemsSourceProperty);
-                ProductsDataGrid.ItemsSource = Database.ProductsList
-                    .Select(p => StorageViewModel.ProductToDataGrid(p, (MinMaxOptions)SchedComboBox.SelectedIndex));
-            }, DispatcherPriority.Background);
-        };
+            ProductsDataGrid.ClearValue(DataGrid.ItemsSourceProperty);
+            IEnumerable<Product> list = (sender as ObservableCollection<Product>) ?? (IEnumerable<Product>)Database.ProductsList.ToList();
+            ProductsDataGrid.ItemsSource = list
+                .Select(p => StorageViewModel.ProductToDataGrid(p, (MinMaxOptions)SchedComboBox.SelectedIndex));
+        }, DispatcherPriority.Background);
     }
     
     private async void RegisterProductButton(object sender, RoutedEventArgs e)

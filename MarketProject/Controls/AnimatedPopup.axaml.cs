@@ -120,6 +120,7 @@ public partial class AnimatedPopup : UserControl
         _closeAfterTimer.Tick += (_, _) =>
         {
             IsOpen = false;
+            ChildContainer.IsHitTestVisible = false;
             _closeAfterTimer.Stop();
         };
         _closeAfterTimer.Start();

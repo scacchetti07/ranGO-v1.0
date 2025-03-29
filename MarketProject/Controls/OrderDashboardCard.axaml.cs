@@ -16,6 +16,16 @@ public partial class OrderDashboardCard : UserControl
     {
         InitializeComponent();
         UpdateDashboardCard();
+        InitMethods();
+        Database.DatabaseRestored += () =>
+        {
+            InitMethods();
+            UpdateDashboardCard();
+        };
+    }
+
+    private void InitMethods()
+    {
         Database.OrdersList.CollectionChanged += (_, _) => { UpdateDashboardCard(); };
     }
 

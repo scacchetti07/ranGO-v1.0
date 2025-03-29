@@ -32,17 +32,29 @@ public partial class FoodMenuView : UserControl
         InitializeComponent();
         UpdateFood();
         FoodsProperty.Changed.AddClassHandler<FoodMenuView>((_, _) => UpdateFood());
+        InitMethods();
+        Database.DatabaseRestored += () =>
+        {
+            Dispatcher.UIThread.Post(InitMethods);
+            UpdateFood();
+        };    
+    }
 
+    private void InitMethods()
+    {
         Database.FoodsMenuList.CollectionChanged += ((_, _) => { UpdateFood(); });
     }
 
     private async void UpdateFood()
     {
-        FoodMenuCardsPanel.Children.Clear();
-        var foodList = FoodMenuController.FindFoodMenu();
-        if (foodList is null) return;
-        foreach (Foods food in foodList)
-            FoodMenuCardsPanel.Children.Add(_vm.FoodToCard(food));
+        Dispatcher.UIThread.Post(() =>
+        {
+            FoodMenuCardsPanel.Children.Clear();
+            var foodList = FoodMenuController.FindFoodMenu();
+            if (foodList is null) return;
+            foreach (Foods food in foodList)
+                FoodMenuCardsPanel.Children.Add(_vm.FoodToCard(food));
+        });
     }
 
     private async void UpdateFood(FoodTypesEnum? foodtype)

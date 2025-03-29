@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Timers;
@@ -30,9 +31,6 @@ namespace MarketProject.Views;
 
 public partial class OrderHomeView : UserControl
 {
-    private static readonly StyledProperty<ObservableCollection<Orders>> OrdersProperty =
-        AvaloniaProperty.Register<OrderHomeView, ObservableCollection<Orders>>(nameof(OrderController));
-
     private Button? _selectedButton;
     private ICommand _returnCommand;
     private OrderHomeViewModel _vm => DataContext as OrderHomeViewModel;
@@ -46,7 +44,6 @@ public partial class OrderHomeView : UserControl
         InitializeComponent();
         toggleSelectedButton(AllOrdersButton);
         UpdateOrders();
-        OrdersProperty.Changed.AddClassHandler<OrderHomeView>((_, _) => UpdateOrders());
 
         OrderSelected += (order) =>
         {
@@ -67,19 +64,33 @@ public partial class OrderHomeView : UserControl
             }
         };
 
-        Database.OrdersList.CollectionChanged += (_, _) =>
+        InitMethods();
+        Database.DatabaseRestored += () =>
         {
-            if (!OrderHomeViewModel.IsEditable) return;
-            
+            Dispatcher.UIThread.Post(InitMethods); 
             Dispatcher.UIThread.Post(() =>
             {
-                AddPopup.IsOpen = true;
-                AddProdLabel.Content = "Pedido Editado!";
-                ContentAddTextBlock.Text = $"O Pedido foi atualizado com sucesso!";
-            }, DispatcherPriority.Background);
-            UpdateOrders();
+                UpdateOrders();
+            });
+        };    
+    }
 
-        };
+    private void InitMethods()
+    {
+        Database.OrdersList.CollectionChanged += UpdateOrdersAndShowPopupIfNotEditable;
+    }
+
+    private void UpdateOrdersAndShowPopupIfNotEditable(object sender,NotifyCollectionChangedEventArgs e)
+    {
+        if (!OrderHomeViewModel.IsEditable) return;
+            
+        Dispatcher.UIThread.Post(() =>
+        {
+            AddPopup.IsOpen = true;
+            AddProdLabel.Content = "Pedido Editado!";
+            ContentAddTextBlock.Text = $"O Pedido foi atualizado com sucesso!";
+        }, DispatcherPriority.Background);
+        UpdateOrders();
     }
 
     private void unSelectButton()
@@ -165,8 +176,8 @@ public partial class OrderHomeView : UserControl
 
             Dispatcher.UIThread.Post(() =>
             {
-                StringBuilder sb = new StringBuilder();
-                var lastId = sb.Append(newOrder.Id.TakeLast(4));
+                
+                var lastId = new string(newOrder.Id.TakeLast(4).ToArray());
                 AddPopup.IsOpen = true;
                 AddProdLabel.Content = "Novo Pedido Adicionado!";
                 ContentAddTextBlock.Text = $"Pedido de Id '#{lastId}' foi adicionado!";
