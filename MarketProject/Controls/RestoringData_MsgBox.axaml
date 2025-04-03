@@ -1,19 +1,27 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:MarketProject.ViewModels"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="200"
              x:Class="MarketProject.Controls.RestoringData_MsgBox"
              FontFamily="{StaticResource FilsonPro}"
+             x:DataType="vm:OptionsViewModel"
              Height="180"
-             Width="450">
-    
-    <Border Width="430" Height="150" BoxShadow="0 0 22 0 #3374B9" CornerRadius="5"
-            BorderBrush="White" BorderThickness="2">
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="32">
-            <TextBlock Text="Importando dados de dd/mm/yyyy" HorizontalAlignment="Center" FontSize="22" FontWeight="Bold"/>
-            <ProgressBar Background="#B3DBDBDA" Width="406" Height="20" Foreground="#6EA759" ShowProgressText="True" FontWeight="Medium"/>
+             Width="450"
+             WindowStartupLocation = "CenterScreen"
+             ExtendClientAreaChromeHints = "NoChrome"
+             ExtendClientAreaToDecorationsHint="True"
+             CanResize = "False"
+             ShowInTaskbar = "True"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center">
+
+    <Border Classes="Restoring_MsgBox">
+        <StackPanel>
+            <Label x:Name="DateLabel"/>
+            <ProgressBar x:Name="RestoringProgressBar"/>
         </StackPanel>
     </Border>
 
-</UserControl>
+</Window>

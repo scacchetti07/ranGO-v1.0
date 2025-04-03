@@ -1338,7 +1338,7 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="Spacing" Value="32"/>
-            <Style Selector="^ TextBlock">
+            <Style Selector="^ Label">
                 <Setter Property="HorizontalAlignment" Value="Center"/>
                 <Setter Property="FontSize" Value="22"/>
                 <Setter Property="FontWeight" Value="Bold"/>
@@ -1352,5 +1352,6 @@
                 <Setter Property="FontWeight" Value="Medium"/>
             </Style>
         </Style>
+
     </Style>
 </Styles>
